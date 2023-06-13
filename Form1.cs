@@ -70,5 +70,52 @@ namespace SQLStringBuilder
             lblTextBox1.Text = sqlToSB ? "SQL" : "StringBuilder";
             lblTextBox2.Text = !sqlToSB ? "SQL" : "StringBuilder";
         }
+
+        private void btnConvertInsert_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var data = txtInsertData.Text;
+                var sb = new StringBuilder();
+                sb.AppendLine($"INSERT INTO {txtTableName.Text.Trim()}");
+                var newLine = "VALUES (";
+                foreach (var line in data.Split("\r\n"))
+                {
+                    var splitString = line.Split('\t');
+                    foreach (var item in splitString)
+                    {
+                        var value = $"'{item.Trim()}',";
+                        newLine += value;
+                    }
+                    newLine = newLine.Remove(newLine.Length - 1);
+                    newLine += "),";
+                    sb.AppendLine(newLine);
+                    newLine = "(";
+                }
+                var result = sb.ToString().Trim();
+                txtInsertSQL.Text = result.Remove(result.Length - 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void btnCopyInsert_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtInsertSQL.Text))
+            {
+                return;
+            }
+            Clipboard.SetText(txtInsertSQL.Text);
+            txtInsertSQL.SelectAll();
+            txtInsertSQL.Focus();
+        }
+
+        private void btnClearInsert_Click(object sender, EventArgs e)
+        {
+            txtInsertData.Text = "";
+            txtInsertSQL.Text = "";
+        }
     }
 }
